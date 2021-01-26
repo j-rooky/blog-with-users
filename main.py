@@ -60,7 +60,7 @@ class Comment(db.Model):
 
 
 # Command to create new tables
-db.create_all()
+# db.create_all()
 
 gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False,
                     base_url=None)
@@ -90,6 +90,10 @@ def get_all_posts():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        if User.query.filter_by(email=form.email.data).first():
+            # User already exists
+            flash("You've already signed up with that email, log in instead!")
+            return redirect(url_for('login'))
         name = form.name.data
         email = form.email.data
         password = generate_password_hash(password=request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
